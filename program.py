@@ -46,39 +46,67 @@ class Deck:
 
 
 testDeck = Deck()
-# print(len(testDeck))
-# print(testDeck())
-# print(testDeck.shuffle())
 
 
 class Hand(Deck):
 
-    def __init__(self, value=0):
+    def __init__(self, name):
         Deck.__init__(self)
+        self.name = name
         self.cards = []
         self.value = 0
+        self.preview = 0
         self.aces = 0
 
     def add_card(self):
+        self.value = 0
         self.cards.append(self.deck[0])
         self.deck = self.deck[1::]
         for card in self.cards:
             self.value = self.value + card['value']
         return self.cards
-        # print(self.deck)
 
     def deal_hand(self):
         random.shuffle(self.deck)
         self.cards = self.deck[0:2]
+        self.preview = self.cards[0]['value']
         for card in self.cards:
             self.value = self.value + card['value']
         return self.cards
 
+    def preview_hand(self):
+        print(f'{self.name} hand: '.upper())
+        print(str(self.cards[0]['rank'] + ' of ' + self.cards[0]['suit']))
+        print(str('Dealer Preview: ' + str(self.cards[0]['value'])))
+        return ''
+
     def __call__(self):
-        return (self.cards, self.value)
+        return self.cards
+
+    def __str__(self):
+        print(f'{self.name} hand: '.upper())
+        for card in self.cards:
+            print(str(card['rank'] + ' of ' + card['suit']))
+        print(str('Current Value: ' + str(self.value)))
+        return ''
 
 
-player_hand = Hand()
+# deal hands
+# player_hand = Hand('player')
+# dealer_hand = Hand('dealer')
+
+def show_table_preview():
+    print('****************')
+    print(player_hand)
+    print(dealer_hand.preview_hand())
+    print('****************')
+
+
+def show_table_full():
+    print('****************')
+    print(player_hand)
+    print(dealer_hand)
+    print('****************')
 
 
 class Chips:
@@ -96,23 +124,46 @@ while True:
 
     play_game = str(input(f'Would you like to play?, enter "y" or "n"'))
     if play_game.lower()[0] == 'y':
+        # deal hands
+        player_hand = Hand('player')
+        dealer_hand = Hand('dealer')
         print('lets play!\n')
-        print('your hand is:\n')
-        print(player_hand.deal_hand())
-        print(player_hand.value)
-        while (player_hand.value < 21):
-            print(f'Your current value is {player_hand.value} \n')
-            dealer_ask = str(input(f'Would you like a hit?'))
-            if (dealer_ask.lower()[0] == 'y'):
-                print('HIT ME')
+        player_hand.deal_hand()
+        dealer_hand.deal_hand()
+        show_table_preview()
+        while (player_hand.value < 22):
+            print('PLAYER TURN')
+            player_ask = ''
+            player_ask = str(input(f'Hit or Stay?'))
+            # hit, handle player
+            if (player_ask.lower()[0] == 'h'):
                 player_hand.add_card()
+                show_table_preview()
                 continue
+            # stay, handle dealer
             else:
-                print('DEALER TURN NOW')
-                break
+                # dealer wins
+                while (dealer_hand.value < player_hand.value):
+                    show_table_full()
+                    dealer_hand.add_card()
+                    if (dealer_hand.value < player_hand.value):
+                        show_table_full()
+                        continue
+                    elif (dealer_hand.value > 21):
+                        show_table_full()
+                        print('DEALER BUST! PLAYER WINS!')
+                        # replay()
+                        break
+                    else:
+                        show_table_full()
+                        print('DEALER WINS!')
+                        # replay()
+                        break
         else:
-            print('BUST!')
-            break
+            show_table_preview()
+            print('PLAYER BUST! DEALER WINS')
+            # replay()
+            continue
     else:
-        print('enter valid input')
-        continue
+        print('enter "y" to begin playing')
+        break
