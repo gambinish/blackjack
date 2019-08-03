@@ -124,6 +124,7 @@ while True:
 
     play_game = str(input(f'Would you like to play?, enter "y" or "n"'))
     if play_game.lower()[0] == 'y':
+        playing = True
         # deal hands
         player_hand = Hand('player')
         dealer_hand = Hand('dealer')
@@ -132,33 +133,36 @@ while True:
         dealer_hand.deal_hand()
         show_table_preview()
         while (player_hand.value < 22):
-            print('PLAYER TURN')
-            player_ask = ''
-            player_ask = str(input(f'Hit or Stay?'))
-            # hit, handle player
-            if (player_ask.lower()[0] == 'h'):
-                player_hand.add_card()
-                show_table_preview()
-                continue
-            # stay, handle dealer
+            if (playing):
+                print('PLAYER TURN')
+                player_ask = ''
+                player_ask = str(input(f'Hit or Stay?'))
+                # hit, handle player
+                if (player_ask.lower()[0] == 'h'):
+                    player_hand.add_card()
+                    show_table_preview()
+                    continue
+                # stay, handle dealer
+                else:
+                    # dealer wins
+                    while (dealer_hand.value < player_hand.value):
+                        show_table_full()
+                        dealer_hand.add_card()
+                        if (dealer_hand.value < player_hand.value):
+                            show_table_full()
+                            continue
+                        elif (dealer_hand.value > 21):
+                            show_table_full()
+                            print('DEALER BUST! PLAYER WINS!')
+                            playing = False
+                            break
+                        else:
+                            show_table_full()
+                            print('DEALER WINS!')
+                            playing = False
+                            break
             else:
-                # dealer wins
-                while (dealer_hand.value < player_hand.value):
-                    show_table_full()
-                    dealer_hand.add_card()
-                    if (dealer_hand.value < player_hand.value):
-                        show_table_full()
-                        continue
-                    elif (dealer_hand.value > 21):
-                        show_table_full()
-                        print('DEALER BUST! PLAYER WINS!')
-                        # replay()
-                        break
-                    else:
-                        show_table_full()
-                        print('DEALER WINS!')
-                        # replay()
-                        break
+                break
         else:
             show_table_preview()
             print('PLAYER BUST! DEALER WINS')
