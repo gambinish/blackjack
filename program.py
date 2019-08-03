@@ -45,9 +45,6 @@ class Deck:
         return len(self.deck)
 
 
-testDeck = Deck()
-
-
 class Hand(Deck):
 
     def __init__(self, name):
@@ -91,9 +88,19 @@ class Hand(Deck):
         return ''
 
 
-# deal hands
-# player_hand = Hand('player')
-# dealer_hand = Hand('dealer')
+class Chips:
+
+    def __init__(self):
+        self.total = 100
+        self.bet = 0
+
+    def make_bet(self):
+        if (self.bet <= self.total):
+            self.total = self.total - self.bet
+
+    def __str__(self):
+        return str(self.total)
+
 
 def show_table_preview():
     print('****************')
@@ -109,65 +116,81 @@ def show_table_full():
     print('****************')
 
 
-class Chips:
+# GAME #
 
-    def __init__(self):
-        self.total = 100
-        self.bet = 0
-
-    def make_bet(self):
-        if (self.bet <= self.total):
-            self.total = self.total - self.bet
-
+player_chips = Chips()
 
 while True:
-
-    play_game = str(input(f'Would you like to play?, enter "y" or "n"'))
-    if play_game.lower()[0] == 'y':
-        playing = True
-        # deal hands
-        player_hand = Hand('player')
-        dealer_hand = Hand('dealer')
-        print('lets play!\n')
-        player_hand.deal_hand()
-        dealer_hand.deal_hand()
-        show_table_preview()
-        while (player_hand.value < 22):
-            if (playing):
-                print('PLAYER TURN')
-                player_ask = ''
-                player_ask = str(input(f'Hit or Stay?'))
-                # hit, handle player
-                if (player_ask.lower()[0] == 'h'):
-                    player_hand.add_card()
-                    show_table_preview()
-                    continue
-                # stay, handle dealer
-                else:
-                    # dealer wins
-                    while (dealer_hand.value < player_hand.value):
-                        show_table_full()
-                        dealer_hand.add_card()
-                        if (dealer_hand.value < player_hand.value):
-                            show_table_full()
-                            continue
-                        elif (dealer_hand.value > 21):
-                            show_table_full()
-                            print('DEALER BUST! PLAYER WINS!')
-                            playing = False
-                            break
-                        else:
-                            show_table_full()
-                            print('DEALER WINS!')
-                            playing = False
-                            break
-            else:
-                break
-        else:
+    if (player_chips.total > 0):
+        play_game = str(input(f'Press "y" to begin'))
+        if play_game.lower()[0] == 'y':
+            playing = True
+            # deal hands
+            player_hand = Hand('player')
+            dealer_hand = Hand('dealer')
+            print('lets play!\n')
+            player_hand.deal_hand()
+            dealer_hand.deal_hand()
             show_table_preview()
-            print('PLAYER BUST! DEALER WINS')
-            # replay()
-            continue
+            print('Current Balance: ', player_chips)
+            player_bet = int(input('How much do you want to bet?'))
+            if (player_bet <= player_chips.total):
+                player_chips.bet = player_bet
+                while (player_hand.value < 22):
+                    if (playing):
+                        print('PLAYER TURN')
+                        player_ask = str(input(f'Hit or Stay?'))
+                        # hit, handle player
+                        if (player_ask.lower()[0] == 'h'):
+                            player_hand.add_card()
+                            show_table_preview()
+                            continue
+                        # stay, handle dealer
+                        else:
+                            while (dealer_hand.value < player_hand.value):
+                                show_table_full()
+                                dealer_hand.add_card()
+                                if (dealer_hand.value < player_hand.value):
+                                    show_table_full()
+                                    continue
+                                elif (dealer_hand.value > 21):
+                                    show_table_full()
+                                    print('DEALER BUST! PLAYER WINS!')
+                                    player_chips.total = player_chips.total + player_chips.bet
+                                    playing = False
+                                    break
+                                else:
+                                    show_table_full()
+                                    print('DEALER WINS!')
+                                    player_chips.total = player_chips.total - player_chips.bet
+                                    playing = False
+                                    break
+                            else:
+                                show_table_full()
+                                print('DEALER WINS!')
+                                player_chips.total = player_chips.total - player_chips.bet
+                                playing = False
+                                break
+                    else:
+                        break
+                else:
+                    show_table_preview()
+                    print('PLAYER BUST! DEALER WINS')
+                    player_chips.total = player_chips.total - player_chips.bet
+                    playing = False
+                    continue
+            else:
+                print('insufficient funds!')
+                continue
+        else:
+            print('enter "y" to begin playing')
+            break
     else:
-        print('enter "y" to begin playing')
-        break
+        print('GAME OVER')
+        replay = str(input(f'Play Again?, enter "y" or "n"'))
+        if (replay.lower()[0] == 'y'):
+            player_chips.total = 100
+            continue
+        else:
+            player_chips.total = 100
+            break
