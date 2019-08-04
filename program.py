@@ -122,7 +122,7 @@ player_chips = Chips()
 
 while True:
     if (player_chips.total > 0):
-        play_game = str(input(f'Press "y" to begin'))
+        play_game = str(input(f'Begin playing? [y/n]: '))
         if play_game.lower()[0] == 'y':
             playing = True
             # deal hands
@@ -133,13 +133,13 @@ while True:
             dealer_hand.deal_hand()
             show_table_preview()
             print('Current Balance: ', player_chips)
-            player_bet = int(input('How much do you want to bet?'))
+            player_bet = int(input('How much do you want to bet? '))
             if (player_bet <= player_chips.total):
                 player_chips.bet = player_bet
                 while (player_hand.value < 22):
                     if (playing):
-                        print('PLAYER TURN')
-                        player_ask = str(input(f'Hit or Stay?'))
+                        print('\n* PLAYER TURN *\n')
+                        player_ask = str(input(f'Hit or Stay [h/s]: '))
                         # hit, handle player
                         if (player_ask.lower()[0] == 'h'):
                             player_hand.add_card()
@@ -155,19 +155,19 @@ while True:
                                     continue
                                 elif (dealer_hand.value > 21):
                                     show_table_full()
-                                    print('DEALER BUST! PLAYER WINS!')
+                                    print('DEALER BUST! PLAYER WINS!\n')
                                     player_chips.total = player_chips.total + player_chips.bet
                                     playing = False
                                     break
                                 else:
                                     show_table_full()
-                                    print('DEALER WINS!')
+                                    print('DEALER WINS!\n')
                                     player_chips.total = player_chips.total - player_chips.bet
                                     playing = False
                                     break
                             else:
                                 show_table_full()
-                                print('DEALER WINS!')
+                                print('DEALER WINS!\n')
                                 player_chips.total = player_chips.total - player_chips.bet
                                 playing = False
                                 break
@@ -175,19 +175,19 @@ while True:
                         break
                 else:
                     show_table_preview()
-                    print('PLAYER BUST! DEALER WINS')
+                    print('PLAYER BUST! DEALER WINS\n')
                     player_chips.total = player_chips.total - player_chips.bet
                     playing = False
                     continue
             else:
-                print('insufficient funds!')
+                print('Insufficient funds!\n')
                 continue
         else:
-            print('enter "y" to begin playing')
+            print('Begin playing? [y/n]: ')
             break
     else:
         print('GAME OVER')
-        replay = str(input(f'Play Again?, enter "y" or "n"'))
+        replay = str(input(f'\n Play Again? [y/n]: '))
         if (replay.lower()[0] == 'y'):
             player_chips.total = 100
             continue
